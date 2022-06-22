@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>销售机会表</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../layui/css/layui.css" tppabs="http://www.layuis.com/res/layui/dist/css/layui.css"  media="all">
+  <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+	<button class="layui-btn layui-btn-sm" lay-event="addSc">添加</button>
+    <button class="layui-btn layui-btn-sm" lay-event="updateSc">更新</button>
+    <button class="layui-btn layui-btn-sm" lay-event="delSc">删除</button>
+    <button id="givesc" class="layui-btn layui-btn-sm" lay-event="giveSc">分配</button>
+	
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="../layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 -->
+<script>
+//全局变量：弹出窗口也能使用到这些数据
+var table = null;
+var row = null;
+
+layui.use(['table','layer','jquery'], function(){
+  table = layui.table;//加载模块
+  var layer = layui.layer;
+  var $ = layui.jquery;
+  //render渲染（表格的渲染）
+  table.render({
+    elem: '#test'
+    ,url:'http://localhost:8080/sc/list'/*tpa=http://www.layui.com/test/table/demo1.json*/
+    ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+    ,title: '销售机会数据表'
+    ,cols: [[
+      {type: 'checkbox', fixed: 'left'}
+      ,{field:'scId', title:'ID', width:80, fixed: 'left', sort: true}
+      ,{field:'scCusname', title:'客户名称', width:120}
+      ,{field:'scComming', title:'机会来源', width:150}
+      ,{field:'scName', title:'联系人', width:80}
+      ,{field:'scPhone', title:'联系方式', width:100}
+      ,{field:'scSuccess', title:'成功几率'}
+      ,{field:'scMessage', title:'机会概要', width:80}
+      ,{field:'scDesc', title:'机会描述', width:120}
+      ,{field:'scUser', title:'创建人', width:100}
+      ,{field:'scCreatetime', title:'加入时间', width:120, sort: true}
+	  ,{field:'scGiveuser', title:'分配给谁', width:120}
+	  ,{field:'scGivetime', title:'分配时间', width:120, sort: true}
+	  ,{field:'scStatus', title:'机会状态', width:120,templet:function(row){
+		  var res = "";
+		  switch(row.scStatus){
+			  case 0:
+			  res = "未分配";
+			  break;
+			  case 1:
+			  res = "已分配";
+			  break;
+			  case 2:
+			  res = "开发成功";
+			  break;
+			  case 3:
+			  res = "开发失败";
+			  break;
+		  }
+		  return res;
+	  }}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+    ]]
+    ,page: true,
+	limit:20,//每页显示5条
+	limits:[20,50,100]//自选每页显示的行条数
+  });
+  
+  //判断当前用户的角色是否需要隐藏分配按钮
+  if(window.localStorage.rid!=1){
+	  $("#givesc").hide();//hide--隐藏
+  }
+  
+  //头工具栏事件
+  table.on('toolbar(test)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+      case 'addSc':
+        //打开增加销售机会的窗口，弹出层
+		layer.open({
+			type:2,//显示一个完整的HTML页面
+			title:"增加销售机会",
+			content:"./scAdd.html",//需要显示的HTML的文件路径
+			area:["600px","480px"],
+			maxmin:true,
+			move:false,
+			shadeClose:true
+		})
+      break;
+      case 'updateSc':
+		var data = checkStatus.data;
+		row = data[0];//data是数组
+		if(data.length!=1){
+			layer.msg("只支持操作一行数据");
+			return;
+		}
+		if(row.scStatus!=0){
+			layer.msg("该销售机会已分配，不能支持更新");
+			return;
+		}
+		if(row.scUser!=window.localStorage.uname){
+			layer.msg("权限不够，你不能修改这条数据")
+			return;
+		}
+        layer.open({
+			type:2,
+			title:"更新销售机会",
+			content:"./scUpdate.html",
+			area:["600px","480px"],
+			minmax:true,
+			move:false,
+			shadeClose:true
+		})
+      break;
+      case 'delSc':
+        var data = checkStatus.data;
+        row = data[0];//data是数组
+        if(data.length!=1){
+        	layer.msg("只支持操作一行数据");
+        	return;
+        }
+        if(row.scStatus!=0){
+        	layer.msg("该销售机会不能支持删除");
+        	return;
+        }
+        if(row.scUser!=window.localStorage.uname){
+        	layer.msg("权限不够，你不能删除这条数据")
+        	return;
+        }
+		layer.confirm('真的删除行么', function(index){
+				  $.ajax({
+					url:"http://localhost:8080/sc/del",
+					type:"post",
+					data:{scId:row.scId},
+					dataType:"json",
+					success:function(res){
+						if(res.msg){
+							layer.msg("删除成功")
+						}else{
+							layer.msg("删除失败")
+						}
+					}
+				})
+				layer.close(index);
+				//刷新页面table
+				table.reload("test");
+		});
+      break;
+	  case 'giveSc':
+	    var flag = true;
+		var data = checkStatus.data;
+		row = data[0];//data是数组
+		if(data.length!=1){
+			layer.msg("只支持操作一行数据");
+			return;
+		}
+		if(row.scStatus!=0){
+			layer.msg("该销售机会已经分配，不能在进行分配了");
+			return;
+		}
+		layer.open({
+			type:2,
+			title:"分配销售机会",
+			content:"./scGive.html",
+			area:["600px","480px"],
+			minmax:true,
+			move:false,
+			shadeClose:true
+		})
+	  break;
+    };
+  });
+  
+  //监听行工具事件，每一行
+  table.on('tool(test)', function(obj){
+    var data = obj.data;//获取的就是对应行的数据
+	row = data;//给全局变量赋值，保存这一行数据，为了在更新界面使用
+    //console.log(obj)
+    if(obj.event === 'del'){
+	  if(data.scStatus!=0 ||data.scUser!=window.localStorage.uname){
+		  layer.msg("你不能操作这条数据");
+		  return;
+	  }
+	  layer.confirm('真的删除行么', function(index){
+		  $.ajax({
+			url:"http://localhost:8080/sc/del",
+			type:"get",
+			data:{scId:data.scId},
+			dataType:"json",
+			success:function(res){
+				if(res.msg){
+					layer.msg("删除成功")
+				}else{
+					layer.msg("删除失败")
+				}
+			}
+		})
+		layer.close(index);
+		//刷新页面table
+		table.reload("test");
+	  });
+    } else if(obj.event === 'edit'){
+      if(data.scStatus!=0){
+		  layer.msg("该条数据状态为已分配，不能编辑");
+		  return;
+	  }
+	  if(data.scUser!=window.localStorage.uname){
+	  	layer.msg("权限不够，你不能修改这条数据")
+	  	return;
+		}
+	  layer.open({
+		  type:2,
+		  title:"更新",
+		  content:"./scUpdate.html",
+		  area:["600px","480px"],
+		  minmax:true,
+		  move:false,
+		  shadeClose:true
+	  })
+    }
+  });
+});
+</script>
+
+</body>
+</html>

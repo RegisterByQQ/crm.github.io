@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>crm系统首页</title>
+		<link rel="stylesheet" href="./layui/css/layui.css">
+	</head>
+	<body>
+		<div class="layui-layout layui-layout-admin">
+		  <div class="layui-header">
+		    <div class=" layui-logo layui-icon layui-icon-menu-fill layui-hide-xs layui-bg-black">未来科技crm系统</div>
+		    <!-- 头部区域（可配合layui 已有的水平导航） -->
+		  
+		    <ul class="layui-nav layui-layout-right">
+		      <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+		        <a href="javascript:;">
+		          <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg" class="layui-nav-img">
+		          <span id="loginname">admin</span>
+		        </a>
+		        <dl class="layui-nav-child">
+		          <dd><a href="">我的资料</a></dd>
+		          <dd><a href="">设置</a></dd>
+		          <dd><a href="" id="signout">退出</a></dd>
+		        </dl>
+		      </li>
+		      <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+		        <a href="javascript:;">
+		          <i class="layui-icon layui-icon-more-vertical"></i>
+		        </a>
+		      </li>
+		    </ul>
+		  </div>
+		  
+		  <div class="layui-side layui-bg-black">
+		    <div class="layui-side-scroll">
+		      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+		      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+		        <li class="layui-nav-item layui-nav-itemed">
+		          <a class="layui-icon layui-icon-add-1" href="javascript:;">&nbsp;&nbsp;营销管理</a>
+		          <dl class="layui-nav-child">
+		            <dd><a style="padding-left: 40px;" class="layui-icon layui-icon-edit" href="./saleChance/scList.html" target="showcontent">营销机会管理</a></dd>
+						<dd><a class="layui-icon layui-icon-edit" href="javascript:;" style="padding-left: 40px;">销售计划管理</a>
+							<dl class="layui-nav-child" >
+							  <dd><a class="layui-icon layui-icon-circle-dot" href="./salePlan/myscList.html" target="showcontent" style="padding-left: 80px;">制定销售计划</a></dd>
+							  <dd><a class="layui-icon layui-icon-circle-dot" href="./salePlan/spList.html" target="showcontent" style="padding-left: 80px;">管理销售计划</a></dd>
+							</dl>
+						</dd> 
+		          </dl>
+		        </li>
+								
+				<li class="layui-nav-item">
+				  <a class="layui-icon layui-icon-add-1" href="javascript:;">客户管理</a>
+				  <dl class="layui-nav-child">
+				    <dd><a class="layui-icon layui-icon-circle-dot" href="./customer/cusAdd.html" target="showcontent" style="padding-left: 80px;">增加客户</a></dd>
+				    <dd><a class="layui-icon layui-icon-circle-dot" href="./customer/cuslist.html" target="showcontent" style="padding-left: 80px;">查询客户</a></dd>
+					<dd><a class="layui-icon layui-icon-circle-dot" href="./customer/orderlist.html" target="showcontent" style="padding-left: 80px;">客户历史订单</a></dd>
+				  </dl>
+				</li>
+				
+				<li class="layui-nav-item">
+				  <a class="layui-icon layui-icon-add-1" href="javascript:;">服务管理</a>
+				  <dl class="layui-nav-child">
+				    <dd><a href="javascript:;">list 1</a></dd>
+				    <dd><a href="javascript:;">list 2</a></dd>
+				    <dd><a href="">超链接</a></dd>
+				  </dl>
+				</li>
+				
+				<li class="layui-nav-item">
+				  <a class="layui-icon layui-icon-add-1" href="javascript:;">统计报表</a>
+				  <dl class="layui-nav-child">
+				    <dd><a class="layui-icon layui-icon-circle-dot" href="./reports/customercountbylevel.html" target="showcontent" style="padding-left: 80px;">客户等级统计</a></dd>
+				    <dd><a class="layui-icon layui-icon-circle-dot" href="./reports/customercountbyRegion.html" target="showcontent" style="padding-left: 80px;">客户地区统计</a></dd>
+				    <dd><a class="layui-icon layui-icon-circle-dot" href="./reports/test.html" target="showcontent" style="padding-left: 80px;">test</a></dd>
+				  </dl>
+				</li>
+				
+				<li class="layui-nav-item">
+				  <a class="layui-icon layui-icon-add-1" href="javascript:;">系统管理</a>
+				  <dl class="layui-nav-child">
+				    <dd><a href="javascript:;">list 1</a></dd>
+				    <dd><a href="javascript:;">list 2</a></dd>
+				    <dd><a href="">超链接</a></dd>
+				  </dl>
+				</li>
+		        
+		      </ul>
+		    </div>
+		  </div>
+		  
+		  <div class="layui-body">
+		    <!-- 内容主体区域 -->
+		    <div style="padding: 15px;">
+				<iframe name="showcontent" 
+				src="saleChance/scList.html"
+				style="width: 100%; height: 500px; border: 0;"></iframe>
+			</div>
+		  </div>
+		  
+		  <div class="layui-footer">
+		    <!-- 底部固定区域 -->
+		    底部固定区域
+		  </div>
+		</div>
+		<script src="./layui/layui.js"></script>
+		<script>
+		//根据用户的登陆信息，判断用户是否登陆过
+		if(window.localStorage.uname){
+			window.locaiton="login.html"
+		}
+		
+		//JS 
+		layui.use(['layer', 'jquery'], function(){
+		  var layer = layui.layer
+		  ,util = layui.util
+		  ,$ = layui.jquery;
+		  
+		  //修改网页上登陆的名字
+		$("#loginname").text(window.localStorage.uname)
+		//退出登录
+		$("#signout").click(function(){
+			//清除localStorage中的用户数据
+			window.localStorage.removeItem("uname");
+			window.localStorage.removeItem("rid");
+			//跳转到登陆界面
+			window.location = "login.html";
+			//单击事件之后不要再执行
+			return false
+		})
+		});
+		</script>
+	</body>
+</html>

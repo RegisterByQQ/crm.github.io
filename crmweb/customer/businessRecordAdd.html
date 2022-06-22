@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+	</head>
+	<body style="padding: 70px;">
+		<form class="layui-form" action="" id="cusaddform" lay-filter="cusaddform">
+
+<!-- 			<div class="layui-form-item">
+				<label class="layui-form-label">交易日期</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordDate" lay-verify="required"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+ -->
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易地址</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordAddr"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易概述</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordMessage" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易详情</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordDesc" class="layui-input">
+				</div>
+			</div>
+
+		
+			
+			
+
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</form>
+		<script src="../layui/layui.js"></script>
+		<script>
+			//Demo
+			layui.use(['form', 'jquery', 'layer'], function() {
+				var form = layui.form;
+				var $ = layui.jquery; //加载模块，定义变量
+				var layer = layui.layer;
+
+				//监听提交
+				form.on('submit(formDemo)', function(data) {
+					//layer.msg(JSON.stringify(data.field));
+					var record = data.field; //表单元素的数据
+					//jquery发异步请求的函数ajax
+					record.uName = window.localStorage.uname;
+					$.ajax({
+						url: "http://localhost:8080/record/add?cusId="+window.localStorage.cusid, //请求地址
+						type: "get", //请求方式
+						data: record, //请求的参数
+						dataType: "json", //把响应结果转换为json对象
+						success: function(res) {
+							//res(成功函数)的参数res就是响应结果
+							if (res.msg) {
+								parent.layer.msg("添加成功");
+							} else {
+								parent.layer.msg("添加失败");
+							}
+							//关闭窗口
+							var index = parent.layer.getFrameIndex(window.name)
+							parent.layer.close(index);
+							//刷新父页面table
+							parent.table.reload("record")
+
+						}
+					})
+
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>

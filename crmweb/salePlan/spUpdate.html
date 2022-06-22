@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+		<script src="../layui/layui.js"></script>
+	</head>
+	<body style="padding: 30px;">
+		<form class="layui-form" action="" lay-filter="giveForm">
+			<input name="scId" type="hidden" />
+			<input name="dpId" type="hidden" />
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">执行计划日期</label>
+				<div class="layui-input-block">
+					<input id="calendar" type="text" name="dpExedate" lay-verify="required" autocomplete="off"
+						class="layui-input" placeholder="yyyy-MM-dd">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">计划执行情况</label>
+				<div class="layui-input-block">
+					<textarea name="dpExecase" placeholder="请输入内容" class="layui-textarea"></textarea>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">计划执行人</label>
+				<div class="layui-input-block">
+					<input type="text" name="dpExemanager" lay-verify="required" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">成功几率</label>
+				<div class="layui-input-block">
+					<select name="scStatus" lay-verify="required">
+						<option value=""></option>
+						<option value="1">继续开发</option>
+						<option value="2">开发成功</option>
+						<option value="3">开发失败</option>
+					</select>
+				</div>
+			</div>
+
+
+
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</form>
+		<script>
+			//Demo
+			layui.use(['form', 'jquery', 'laydate'], function() {
+				var form = layui.form;
+				var laydate = layui.laydate; //日历相关模块
+				var $ = layui.$;
+			    var row = parent.row; //获取父页面的全局变量
+				var table = parent.table;
+
+				//回显功能
+				form.val("giveForm", row) //设置表单元素的value值
+				form.render(); //表格渲染，用于解决数据回显不全问题
+
+				//加载日历控件
+				laydate.render({
+					elem: "#calendar" //找到id=calendar的标签元素
+				})
+
+				//监听提交
+				form.on('submit(formDemo)', function(data) {
+					var formValue = data.field;
+					formValue.scGiveuser = window.localStorage.uname;
+					$.ajax({
+						url: "http://localhost:8080/sp/exeplan",
+						type: "get",
+						data: formValue,
+						dataType: "json",
+						success: function(res) {
+							if (res.msg) {
+								parent.layer.msg("执行计划成功");
+							} else {
+								parent.layer.msg("执行计划失败");
+							}
+							//关闭窗口
+							var index = parent.layer.getFrameIndex(window.name)
+							parent.layer.close(index);
+							//刷新父页面table
+							parent.table.reload("test")
+						}
+					})
+					//layer.msg(JSON.stringify(data.field));
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>销售机会表</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../layui/css/layui.css" tppabs="http://www.layuis.com/res/layui/dist/css/layui.css"
+			media="all">
+		<!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+	</head>
+	<body>
+		<table class="layui-hide" id="order" lay-filter="order"></table>
+
+		<script src="../layui/layui.js" charset="utf-8"></script>
+		<!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 -->
+		<script>
+			layui.use(['table', 'layer', 'jquery'], function() {
+				table = layui.table; //加载模块
+				var layer = layui.layer;
+				var $ = layui.jquery;
+				//render渲染（表格的渲染）
+				table.render({
+					elem: '#order' //对应table标签的id
+						,
+					url: 'http://localhost:8080/order/list' //数据接口的URL地址
+						,
+					cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+						,
+					page: true //开启分页功能
+						,
+					limit: 6 //每页的行数，默认为10
+						,
+					limits: [5, 10, 15, 20, 50] //改变每页行数的下拉列表的选项
+						,
+					defaultToolbar: [] //不显示默认的工具栏
+						,
+					cols: [
+						[{
+							field: 'orderId',
+							width: 120,
+							title: '订单编号'
+						}, {
+							field: 'orderDate',
+							width: 120,
+							title: '订单日期'
+						}, {
+							field: 'orderAmount',
+							title: '订单金额',
+							width: 120
+						}, {
+							field: 'orderAddr',
+							title: '发货地址'
+						}, {
+							field: 'orderStatus',
+							title: '订单状态',
+							width: 120,
+							templet: function(row) {
+								var res = "";
+								switch (row.orderStatus) {
+									case "A":
+										res = "未付款";
+										break;
+									case "B":
+										res = "已付款";
+										break;
+									case "C":
+										res = "已发货";
+										break;
+									case "D":
+										res = "已收货";
+										break;
+									case "E":
+										res = "已退货";
+										break;
+								}
+								return res;
+							}
+						}, {
+							field: 'cusId',
+							width: 120,
+							title: '客户编号'
+						}]
+					]
+				});
+
+			});
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+	</head>
+	<body style="padding: 70px;">
+		<form class="layui-form" action="" id="recordupdateform" lay-filter="recordupdateform">
+			
+			<input name="recordId" type="hidden" />
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易地址</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordAddr"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易概述</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordMessage" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">交易详情</label>
+				<div class="layui-input-block">
+					<input type="text" name="recordDesc" class="layui-input">
+				</div>
+			</div>
+			
+					
+			
+			
+		
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</form>
+		<script src="../layui/layui.js"></script>
+		<script>
+			//Demo
+			layui.use(['form', 'jquery', 'layer'], function() {
+				var form = layui.form;
+				var $ = layui.jquery;
+				var layer = layui.layer;
+				var row = parent.row; //获取父页面的全局变量
+				console.log(row);
+				//回显功能
+				form.val("recordupdateform", row) //设置表单元素的value值
+				form.render(); //表格渲染，用于解决数据回显不全问题
+				//监听提交
+				form.on('submit(formDemo)', function(data) {
+					//layer.msg(JSON.stringify(data.field));
+					data.field.cusId = window.localStorage.cusid;
+					$.ajax({
+						url: "http://localhost:8080/record/update",
+						type: "get",
+						data: data.field,
+						dataType: "json",
+						success: function(res) {
+							if (res.msg) {
+								layer.msg("更新成功");
+							} else {
+								layer.msg("更新失败")
+							}
+							setTimeout(function() {
+								var index = parent.layer.getFrameIndex(window.name);
+								parent.layer.close(index);
+								parent.table.reload("record");
+							}, 1000);
+						}
+					})
+					return false;
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>更新</title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+	</head>
+	<body style="padding: 30px;">
+		<form class="layui-form" action="" lay-filter="updateForm">
+			<input name="scId" type="hidden" />
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">客户名称</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="scCusname" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">机会来源</label>
+		    <div class="layui-input-block">
+		      <select name="scComming" lay-verify="required">
+		        <option value=""></option>
+		        <option value="广告">广告</option>
+		        <option value="介绍">介绍</option>
+		        <option value="宣传单">宣传单</option>
+		      </select>
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">联系人</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="scName"lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">联系方式</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="scPhone"  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">成功几率</label>
+		    <div class="layui-input-block">
+		      <select name="scSuccess" lay-verify="required">
+		        <option value=""></option>
+		        <option value="20%">20%</option>
+		        <option value="50%">50%</option>
+		        <option value="70%">70%</option>
+		      </select>
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">机会概要</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="scMessage" lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+		    </div>
+		  </div>
+		  
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">机会描述</label>
+		    <div class="layui-input-block">
+		      <input type="textArea" name="scDesc"class="layui-input">
+		    </div>
+		  </div>
+		  
+		  
+		  <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+		      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		    </div>
+		  </div>
+		</form>
+		<script src="../layui/layui.js"></script>
+		<script>
+		//Demo
+		layui.use(['form','jquery','layer'], function(){
+		  var form = layui.form;
+		  var $ = layui.jquery;
+		  var layer = layui.layer;
+		  var row = parent.row;//获取父页面的全局变量
+		  console.log(row);
+		  //回显功能
+		  form.val("updateForm",row)//设置表单元素的value值
+		  form.render();//表格渲染，用于解决数据回显不全问题
+		  //监听提交
+		  form.on('submit(formDemo)', function(data){
+		    //layer.msg(JSON.stringify(data.field));
+			var sc = data.field;
+			// sc.scUser = window.localStorage.uname;
+			$.ajax({
+				url:"http://localhost:8080/sc/update",
+				type:"get",
+				data:sc,
+				dataType:"json",
+				success:function(res){
+					if(res.msg){
+						layer.msg("更新成功");
+					}else{
+						layer.msg("更新失败")
+					}
+					setTimeout(function() {
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+						parent.table.reload("test");
+						parent.location.reload();
+					}, 1000);
+				}
+			})
+		    return false;
+		  });
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="./layui/css/layui.css">
+	</head>
+	<body>
+		<div style="padding:30px">
+		<form class="layui-form" action="">
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">用户名</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="uName" required  lay-verify="required" autocomplete="off" class="layui-input">
+		    </div>
+		  </div>
+		  <div class="layui-form-item">
+		    <label class="layui-form-label">密&nbsp;&nbsp;&nbsp;&nbsp;码</label>
+		    <div class="layui-input-block">
+		      <input type="password" name="uPassword" required lay-verify="required" autocomplete="off" class="layui-input">
+		    </div>
+		  </div> 
+		  
+		  
+		  <div class="layui-form-item">
+		      <div class="layui-input-block">
+		        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+		        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		      </div>
+		    </div>
+		</form>	
+		</div>
+		
+		<script src="./layui/layui.js"></script>
+		<script>
+		//Demo
+		layui.use(['form','jquery','layer'], function(){
+		  var form = layui.form;
+		  var $ = layui.jquery;
+		  var layer = layui.layer;
+		  //监听提交
+		  form.on('submit(formDemo)', function(data){//data是表单元素的数据
+		  var udata = data.field;
+		  $.ajax({
+			  url:"http://localhost:8080/login",
+			  type:"get",
+			  data:udata,
+			  dataType:"json",
+			  success:function(res){
+				  if(res.msg){
+					  //存储用户到localStorage
+					  window.localStorage.uname=res.user.uName;//存储数据
+					  window.localStorage.rid=res.user.rId;//存储数据
+					  window.localStorage.uid=res.user.uId;//存储数据
+					  window.location="index.html"//跳转到主页面
+				  }
+				  else{
+					  layer.msg("用户名或密码错误");
+					  //清除输入框中的数据值
+					  $("input").eq(0).val("");//找到标签，设置标签的value值
+					  $("input").eq(1).val("");//找到标签，设置标签的value值
+			  }
+			  }
+		  })
+		    //layer.msg(JSON.stringify(data.field));//具体的数据
+			//访问服务器，让服务器验证账号密码，返回响应结果
+		    return false;
+		  });
+		});
+		</script>
+	</body>
+</html>

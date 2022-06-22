@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+		<script src="../layui/layui.js"></script>
+				<style>
+					#scdetails span{
+						padding: 3px;
+						margin: 2px;
+						color: deepskyblue
+					}
+				</style>
+		</head>
+		<body style="padding: 30px;">
+			<div class="layui-card" style="text-align:center">
+			  <div class="layui-card-header">销售机会详情</div>
+			  <div class="layui-card-body" id="scdetails"></div>
+			</div>
+			
+			<form class="layui-form" action="" lay-filter="giveForm">
+				<input name="scId" type="hidden" />
+			  
+			  <div class="layui-form-item">
+			    <label class="layui-form-label">计划日期</label>
+			    <div class="layui-input-block">
+			      <input id="calendar" type="text" name="dpPlandate" lay-verify="required" autocomplete="off" 
+				  class="layui-input" placeholder="yyyy-MM-dd">
+			    </div>
+			  </div> 
+			  
+			  <div class="layui-form-item layui-form-text">
+			      <label class="layui-form-label">计划内容</label>
+			      <div class="layui-input-block">
+			        <textarea name="dpPlancontent" placeholder="请输入内容" class="layui-textarea"></textarea>
+			      </div>
+			    </div>
+			  
+			  
+			  
+			  <div class="layui-form-item">
+			    <div class="layui-input-block">
+			      <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+			      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			    </div>
+			  </div>
+			</form>
+			<script>
+			
+			
+			//Demo
+			layui.use(['form','jquery','laydate'], function(){
+			  var form = layui.form;
+			  var laydate = layui.laydate;//日历相关模块
+			  var $ = layui.$;
+			  var row = parent.row;//获取父页面的全局变量
+			  
+			  //回显功能
+			  form.val("giveForm",row)//设置表单元素的value值
+			  form.render();//表格渲染，用于解决数据回显不全问题
+			  
+			  //加载日历控件
+			  laydate.render({
+				  elem:"#calendar"//找到id=calendar的标签元素
+			  })
+			  
+			  //显示详细信息
+			  var html_src = "<span>客户名字:"+row.scCusname+"</span>"
+			  html_src += "<span>联系人:"+row.scName+"</span>"
+			  html_src += "<span>联系电话:"+row.scPhone+"</span><br>"
+			  html_src += "<span>客户来源:"+row.scComming+"</span>"
+			  html_src += "<span>描述信息:"+row.scDesc+"</span>"
+			  html_src += "<span>成功几率:"+row.scSuccess+"</span><br>"
+			  $("#scdetails").html(html_src);
+			  
+			  $.ajax({
+				  url:"http://localhost:8080/managers",
+				  type:"get",
+				  dataType:"json",
+				  success:function(res){
+					  var html = "";
+					  for (var i = 0; i < res.length; i++) {
+					  	html += '<option value="'+res[i].uName+'">'+res[i].uName+'</option>';
+					  }
+					  $("#manager").html(html);//把拼接好的html标签设置到html中
+					  form.render();//表格渲染，用于解决数据回显不全问题
+				  }
+			  })
+			  //监听提交
+			  form.on('submit(formDemo)', function(data){
+				  $.ajax({
+					  url:"http://localhost:8080/sp/add",
+					  type:"get",
+					  data:data.field,
+					  dataType:"json",
+					  success:function(res){
+						  if(res.msg){
+							  parent.layer.msg("添加成功");
+							  //关闭窗口
+							  var index = parent.layer.getFrameIndex(window.name)
+							  parent.layer.close(index);
+							  }
+						  else{
+							  parent.layer.msg("添加失败");
+						  }
+					  }
+				  })
+			    //layer.msg(JSON.stringify(data.field));
+			    return false;
+			  });
+			});
+			</script>
+		</body>
+	</html>
+	

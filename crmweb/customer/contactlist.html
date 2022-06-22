@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>销售机会表</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../layui/css/layui.css" tppabs="http://www.layuis.com/res/layui/dist/css/layui.css"  media="all">
+  <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<table class="layui-hide" id="con" lay-filter="con"></table>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="../layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 -->
+<script>
+//全局变量：弹出窗口也能使用到这些数据
+var table = null;
+var row = null;
+
+layui.use(['table','layer','jquery'], function(){
+  table = layui.table;//加载模块
+  var layer = layui.layer;
+  var $ = layui.jquery;
+  //render渲染（表格的渲染）
+  table.render({
+    elem: '#con'
+    ,url:'http://localhost:8080/con/list?cusId='+window.localStorage.cusid
+    ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+    ,title: '客户联系人数据表'
+    ,cols: [[
+      {field:'conId', title:'ID', width:80, fixed: 'left', sort: true}
+      ,{field:'conName', title:'联系人名称', width:120}
+      ,{field:'conSex', title:'联系人性别', width:150}
+      ,{field:'conJob', title:'联系人职位', width:80}
+      ,{field:'conTel', title:'办公电话', width:100}
+      ,{field:'conPhone', title:'联系人个人电话',width:100}
+      ,{field:'conNote', title:'备注'}
+      ,{field:'cusId', title:'客户id', width:120}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+    ]]
+    ,page: true,
+	limit:20,//每页显示5条
+	limits:[20,50,100]//自选每页显示的行条数
+  });
+  
+ 
+  //监听行工具事件，每一行
+  table.on('tool(con)', function(obj){
+    var data = obj.data;//获取的就是对应行的数据
+	row = data;//给全局变量赋值，保存这一行数据，为了在更新界面使用
+    //console.log(obj)
+    if(obj.event === 'del'){
+	  layer.confirm('真的删除该行么', function(index){
+		  $.ajax({
+			url:"http://localhost:8080/con/del",
+			type:"get",
+			data:{conId:data.conId},
+			dataType:"json",
+			success:function(res){
+				if(res.msg){
+					layer.msg("删除成功")
+				}else{
+					layer.msg("删除失败")
+				}
+			}
+		})
+		layer.close(index);
+		//刷新页面table
+		table.reload("con");
+	  });
+    } else if(obj.event === 'edit'){
+	  layer.open({
+		  type:2,
+		  title:"更新",
+		  content:"./conUpdate.html",
+		  area:["600px","480px"],
+		  minmax:true,
+		  move:false,
+		  shadeClose:true
+	  })
+    }
+  });
+});
+</script>
+
+</body>
+</html>

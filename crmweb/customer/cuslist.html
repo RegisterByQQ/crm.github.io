@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../layui/css/layui.css" />
+	</head>
+	<body style="padding: 10px;">
+		<!-- 表格的容器标签 -->
+		<table class="layui-hide" id="customer" lay-filter="customer"></table>
+
+		<script type="text/html" id="toolbarCustomer">
+			<div class="layui-btn-container">
+				<button class="layui-btn layui-btn-sm" lay-event="update">修改</button>
+				<button class="layui-btn layui-btn-sm" lay-event="del">删除</button>
+				<button class="layui-btn layui-btn-sm" lay-event="addContact">新增联系人</button>
+				<button class="layui-btn layui-btn-sm" lay-event="listContact">管理联系人</button>
+				<button class="layui-btn layui-btn-sm" lay-event="listRecord">管理交往记录</button>
+			</div>
+		</script>
+		
+		<script type="text/html" id="barDemo">
+		  <a class="layui-btn layui-btn-xs" lay-event="addRecord">新增交易记录</a>
+		</script>
+		
+		<script src="../layui/layui.js" charset="utf-8"></script>
+		<script>
+			var row = null; //定义全局变量，以便弹出窗口通过parent来获取该变量
+			var table = null;
+			var rowContact = null; //这里放在子页面contactlist.html中保存操作的行数据。
+			layui.use(['rate', 'table', 'element', 'jquery'], function() {
+				var rate = layui.rate; //把layui.rate对象赋给变量rate
+				table = layui.table;
+				var element = layui.element;
+				var $ = layui.jquery;
+				element.render() //显示导航菜单
+
+				table.render({
+					elem: '#customer' //对应table标签的id
+						,
+					url: 'http://localhost:8080/cus/list?uId=' + window.localStorage.uid //数据接口的URL地址
+						,
+					cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+						,
+					page: true //开启分页功能
+						,
+					limit: 6 //每页的行数，默认为10
+						,
+					limits: [2, 4, 6, 8, 10] //改变每页行数的下拉列表的选项
+						,
+					toolbar: '#toolbarCustomer' //开启头部工具栏，并为其绑定左侧模板
+						,
+					defaultToolbar: [] //不显示默认的工具栏
+						,
+					cols: [
+						[{
+								type: 'checkbox'
+							}, {
+								field: 'cusId',
+								width: 80,
+								title: '编号'
+							}, {
+								field: 'cusName',
+								width: 80,
+								title: '名称'
+							}, {
+								field: 'cusRegion',
+								width: 80,
+								title: '地区',
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusRegion) {
+										case 1:
+											ret = '东北';
+											break;
+										case 2:
+											ret = '华北';
+											break;
+										case 3:
+											ret = '西北';
+											break;
+										case 4:
+											ret = '西南';
+											break;
+										case 5:
+											ret = '华南';
+											break;
+										case 6:
+											ret = '华中';
+											break;
+										case 7:
+											ret = '华东';
+											break;
+									}
+									return ret;
+								}
+							}, {
+								field: 'cusIndustry',
+								width: 80,
+								title: '行业',
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusIndustry) {
+										case 1:
+											ret = '金融';
+											break;
+										case 2:
+											ret = '房地产';
+											break;
+										case 3:
+											ret = '商业服务';
+											break;
+										case 4:
+											ret = '运输物流';
+											break;
+										case 5:
+											ret = '生产';
+											break;
+										case 6:
+											ret = '政府';
+											break;
+										case 7:
+											ret = '文化传媒';
+											break;
+										case 7:
+											ret = '其他';
+											break;
+									}
+									return ret;
+								}
+							}, {
+								field: 'cusLevel',
+								title: '等级',
+								width: 80,
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusLevel) {
+										case 'A':
+											ret = '重点客户';
+											break;
+										case 'B':
+											ret = '普通客户';
+											break;
+										case 'C':
+											ret = '非优先客户';
+											break;
+									}
+									return ret;
+								}
+							} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+							, {
+								field: 'cusSatisfy',
+								title: '满意度',
+								width: 80,
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusSatisfy) {
+										case 1:
+											ret = '一级';
+											break;
+										case 2:
+											ret = '二级';
+											break;
+										case 3:
+											ret = '三级';
+											break;
+										case 4:
+											ret = '四级';
+											break;
+										case 5:
+											ret = '五级';
+											break;
+									}
+									return ret;
+								}
+							}, {
+								field: 'cusCredit',
+								title: '信用',
+								width: 80,
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusCredit) {
+										case 1:
+											ret = '一级';
+											break;
+										case 2:
+											ret = '二级';
+											break;
+										case 3:
+											ret = '三级';
+											break;
+										case 4:
+											ret = '四级';
+											break;
+										case 5:
+											ret = '五级';
+											break;
+									}
+									return ret;
+								}
+							}, {
+								field: 'cusAddr',
+								title: '地址',
+								width: 180
+							}, {
+								field: 'cusZipcode',
+								width: 80,
+								title: '邮编'
+							}, {
+								field: 'cusPhone',
+								width: 80,
+								title: '电话'
+							}, {
+								field: 'cusFax',
+								width: 80,
+								title: '传真'
+							}, {
+								field: 'cusUrl',
+								width: 80,
+								title: '网址'
+							}, {
+								field: 'userId',
+								width: 80,
+								title: '客户经理'
+							}, {
+								field: 'cusStatus',
+								width: 80,
+								title: '状态',
+								templet: function(row) {
+									var ret = "";
+									switch (row.cusStatus) {
+										case 0:
+											ret = "流失";
+											break;
+										case 1:
+											ret = "正常";
+											break;
+									}
+									return ret;
+								}
+							},{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+						]
+					]
+				});
+
+				//头工具栏事件
+				table.on('toolbar(customer)', function(obj) { //customer是table标签的lay-filter属性值
+					var checkStatus = table.checkStatus(obj.config.id);
+					// console.log(checkStatus.data[0].cusId);
+					window.localStorage.cusid = checkStatus.data[0].cusId
+					switch (obj.event) { //obj.event 就是工具栏按钮的lay-event属性的值
+						case 'listContact': //管理联系人
+						
+						if(checkStatus.data.length!=1){
+							layer.msg("只能同时操作一个客户的联系人")
+							return;
+						}
+						layer.open({
+							type:2,
+							title:"联系人管理",
+							content:"./contactlist.html",
+							area:["1300px","500px"],
+						})
+							break;
+						case 'listRecord': //管理联系人
+						if(checkStatus.data.length!=1){
+							layer.msg("只能同时操作一个客户的交易记录")
+							return;
+						}
+						layer.open({
+							type:2,
+							title:"交易记录管理",
+							content:"./businessRecordList.html",
+							area:["1300px","500px"],
+						})
+							break;	
+						case 'addContact': // 新增联系人
+						var data = checkStatus.data;
+						row=data[0];
+						if(data.length!=1){
+							layer.msg("一次只能根据一条客户数据进行添加联系人");
+							return;
+						}layer.open({
+							type:2,
+							title:"新增联系人",
+							content:"./addContact.html",
+							area:["600px","480px"],
+						})
+							break;
+						case 'update':
+							var data = checkStatus.data;
+							row = data[0];
+							if (data.length != 1) {
+								layer.msg("只支持操作一行数据");
+								return;
+							}
+							layer.open({
+								type: 2,
+								title: "修改客户信息",
+								content: "./cusUpdate.html",
+								area: ["600px", "480px"],
+							})
+							break;
+						case 'del':
+							var data = checkStatus.data;
+							if (data.length == 0) {
+								layer.msg("至少选中一条数据");
+								return;
+							}
+							layer.confirm("确定删除选中"+data.length+"个的用户吗？", function(index) {
+								var cusids ="";
+								var arr = [];
+								for(var i=0;i<data.length;i++){
+									arr.push(checkStatus.data[i].cusId);
+								}
+								console.log(arr);
+								cusids = arr.join(",")
+								$.ajax({
+									url: "http://localhost:8080/cus/del",
+									data:{cusIds:cusids},
+									type: "get",
+									dataType: "json",
+									success: function(res) {
+										if (res.msg) {
+											layer.msg("删除成功")
+										} else {
+											layer.msg("删除失败")
+										}
+									}
+								})
+								layer.close(index);
+								table.reload("customer");
+								location.reload();
+							});
+							break;
+					}
+				});
+				
+				//监听行工具事件，每一行
+				table.on('tool(customer)', function(obj){
+				  var data = obj.data;//获取的就是对应行的数据
+					row = data;//给全局变量赋值，保存这一行数据，为了在更新界面使用
+				  //console.log(obj)
+				  if(obj.event === 'addRecord'){
+					  layer.open({
+					  	type: 2,
+					  	title: "增加交往记录",
+					  	content: "./businessRecordAdd.html",
+					  	area: ["600px", "480px"],
+					  	minmax: true,
+					  	move: false,
+					  	shadeClose: true
+					  })
+				  } 
+				});
+
+			});
+		</script>
+	</body>
+</html>

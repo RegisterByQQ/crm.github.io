@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css">
+	</head>
+	<body style="padding: 70px;">
+		<form class="layui-form" action="" id="cusaddform" lay-filter="cusaddform">
+			<input name="cusId" type="hidden" />
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusName" lay-verify="required"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户地区</label>
+				<div class="layui-input-block">
+					<select name="cusRegion">
+						<option value=""></option>
+						<option value="1">东北</option>
+						<option value="2">华北</option>
+						<option value="3">西北</option>
+						<option value="4">西南</option>
+						<option value="5">华南</option>
+						<option value="6">华中</option>
+						<option value="7">华东</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户行业</label>
+				<div class="layui-input-block">
+					<select name="cusIndustry">
+						<option value=""></option>
+						<option value="1">金融</option>
+						<option value="2">房地产</option>
+						<option value="3">商业服务</option>
+						<option value="4">运输物流</option>
+						<option value="5">生产</option>
+						<option value="6">政府</option>
+						<option value="7">文化传媒</option>
+						<option value="8">其他</option>
+					</select>
+				</div>
+			</div>
+
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户等级</label>
+				<div class="layui-input-block">
+					<select name="cusLevel">
+						<option value=""></option>
+						<option value="A">重点客户</option>
+						<option value="B">普通客户</option>
+						<option value="C">非优先客户</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户满意度</label>
+				<div class="layui-input-block">
+					<select name="cusSatisfy">
+						<option value=""></option>
+						<option value="1">一级</option>
+						<option value="2">二级</option>
+						<option value="3">三级</option>
+						<option value="4">四级</option>
+						<option value="5">五级</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户信用度</label>
+				<div class="layui-input-block">
+					<select name="cusCredit" >
+						<option value=""></option>
+						<option value="1">一级</option>
+						<option value="2">二级</option>
+						<option value="3">三级</option>
+						<option value="4">四级</option>
+						<option value="5">五级</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户地址</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusAddr"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户邮编</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusZipcode" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户电话</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusPhone"autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户传真</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusFax" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户网址</label>
+				<div class="layui-input-block">
+					<input type="text" name="cusUrl"  autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label">客户状态</label>
+				<div class="layui-input-block">
+					<select name="cusStatus" lay-verify="required">
+						<option value=""></option>
+						<option value="0">流失</option>
+						<option value="1">正常</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</form>
+		<script src="../layui/layui.js"></script>
+		<script>
+			//Demo
+			layui.use(['form', 'jquery', 'layer'], function() {
+				var form = layui.form;
+				var $ = layui.jquery; //加载模块，定义变量
+				var layer = layui.layer;
+
+				//监听提交
+				form.on('submit(formDemo)', function(data) {
+					//layer.msg(JSON.stringify(data.field));
+					var cus = data.field; //表单元素的数据
+					//jquery发异步请求的函数ajax
+					cus.userId = window.localStorage.uid;
+					$.ajax({
+						url: "http://localhost:8080/cus/add?uId="+window.localStorage.uid, //请求地址
+						type: "get", //请求方式
+						data: cus, //请求的参数
+						dataType: "json", //把响应结果转换为json对象
+						success: function(res) {
+							//res(成功函数)的参数res就是响应结果
+							if (res.msg) {
+								layer.msg("添加成功");
+								sleep(2000);if(sleep(2000)){location.reload();}
+							} else {
+								layer.msg("添加失败，该客户可能已存在");
+							}
+
+						}
+						
+					})
+					
+					return false;
+				});
+				
+				
+				
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../layui/css/layui.css" />
+	</head>
+	<body style="padding: 10px;">
+		<!-- 表格的容器标签 -->
+		<table class="layui-hide" id="record" lay-filter="record"></table>
+
+		
+		<script type="text/html" id="barDemo">
+		  <a class="layui-btn layui-btn-xs" lay-event="updateRecord">修改</a>
+		  <a class="layui-btn layui-btn-xs" lay-event="delRecord">删除</a>
+		</script>
+		
+		<script src="../layui/layui.js" charset="utf-8"></script>
+		<script>
+			var row = null; //定义全局变量，以便弹出窗口通过parent来获取该变量
+			var table = null;
+			var rowContact = null; //这里放在子页面contactlist.html中保存操作的行数据。
+			layui.use(['rate', 'table', 'element', 'jquery'], function() {
+				var rate = layui.rate; //把layui.rate对象赋给变量rate
+				table = layui.table;
+				var element = layui.element;
+				var $ = layui.jquery;
+				element.render() //显示导航菜单
+
+				table.render({
+					elem: '#record' //对应table标签的id
+						,
+					url:'http://localhost:8080/record/list?cusId='+window.localStorage.cusid //数据接口的URL地址
+						,
+					cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+						,
+					page: true //开启分页功能
+						,
+					limit: 6 //每页的行数，默认为10
+						,
+					limits: [2, 4, 6, 8, 10] //改变每页行数的下拉列表的选项
+						,
+					defaultToolbar: [] //不显示默认的工具栏
+						,
+					cols: [
+						[{
+								field: 'recordId',
+								width: 120,
+								title: '交易记录编号'
+							}, {
+								field: 'recordDate',
+								width: 120,
+								title: '交易日期'
+							},  {
+								field: 'recordAddr',
+								title: '交易地址',
+								width: 180
+							}, {
+								field: 'recordMessage',
+								width: 180,
+								title: '交易概述'
+							}, {
+								field: 'recordDesc',
+								title: '交易详情'
+							},{
+								field: 'cusId',
+								width: 120,
+								title: '客户编号'
+							}, {
+								field: 'uName',
+								width: 120,
+								title: '客户经理'
+							},{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+						]
+					]
+				});
+
+				//监听行工具事件，每一行
+				table.on('tool(record)', function(obj){
+				  var data = obj.data;//获取的就是对应行的数据
+					row = data;//给全局变量赋值，保存这一行数据，为了在更新界面使用
+				  //console.log(obj)
+				  if(obj.event === 'updateRecord'){
+					  layer.open({
+					  	type: 2,
+					  	title: "修改",
+					  	content: "./businessRecordUpdate.html",
+					  	area: ["600px", "480px"],
+					  	minmax: true,
+					  	move: false,
+					  	shadeClose: true
+					  })
+				  } else if(obj.event==='delRecord'){
+					  layer.confirm("确定删除选中的用户吗？", function(index) {
+					  	$.ajax({
+					  		url: "http://localhost:8080/record/del",
+					  		data:data,
+					  		type: "get",
+					  		dataType: "json",
+					  		success: function(res) {
+					  			if (res.msg) {
+					  				layer.msg("删除成功")
+					  			} else {
+					  				layer.msg("删除失败")
+					  			}
+					  		}
+					  	})
+					  	layer.close(index);
+					  	table.reload("record");
+					  });
+				  }
+				});
+
+			});
+		</script>
+	</body>
+</html>
